@@ -97,6 +97,27 @@ def relu_forward(x):
     cache = x
     return out, cache
 
+def relu_backward(dout, cache):
+    """
+    Computes the backward pass for a layer of rectified linear units (ReLUs).
+
+    Input:
+    - dout: Upstream derivatives, of any shape
+    - cache: Input x, of same shape as dout
+
+    Returns:
+    - dx: Gradient with respect to x
+    """
+    dx, x = None, cache
+    #############################################################################
+    # TODO: Implement the ReLU backward pass.                                   #
+    #############################################################################
+    dx = np.where(x >=0, dout, 0)
+    #############################################################################
+    #                             END OF YOUR CODE                              #
+    #############################################################################
+    return dx
+
 def softmax_loss(x, y):
     """
     Computes the loss and gradient for softmax classification.
@@ -202,7 +223,7 @@ class TwoLayerNet(object):
         h1, cache1 = affine_forward(X, W1, b1)
         h1, cache_relu = relu_forward(h1)
         scores, cache2 = affine_forward(h1, W2, b2)
-        loss, dscores = softmax_loss(scores, y)
+        
 
         ############################################################################
         #                             END OF YOUR CODE                             #
@@ -224,6 +245,7 @@ class TwoLayerNet(object):
         # automated tests, make sure that your L2 regularization includes a factor #
         # of 0.5 to simplify the expression for the gradient.                      #
         ############################################################################
+        loss, dscores = softmax_loss(scores, y)
 
         ############################################################################
         #                             END OF YOUR CODE                             #
