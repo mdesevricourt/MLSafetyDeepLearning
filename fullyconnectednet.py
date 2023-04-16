@@ -1,7 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from functions import *
+from functions import affine_backward, affine_forward, relu_backward, relu_forward, softmax_loss, affine_relu_foward, affine_relu_backward
 from solver import Solver
+from twolayernet import TwoLayerNet
+
 
 class FullyConnectedNet(object):
     """
@@ -134,7 +136,20 @@ class FullyConnectedNet(object):
         # self.bn_params[1] to the forward pass for the second batch normalization #
         # layer, etc.                                                              #
         ############################################################################
+        cache = []
+        for layer in range(self.num_layers-1):
+            W = self.params["W" + str(layer+1)]
+            b = self.params["b" + str(layer+1)]
+            
+
+            X, cache_layer = affine_relu_forward(X, W, b)
+            cache.append(cache_layer)
         
+        W = self.params["W" + str(self.num_layers)]
+        b = self.params["b" + str(self.num_layers)]
+        scores, cache_layer = affine_forward(X, W, b)
+        cache.append(cache_layer)       
+             
 
         ############################################################################
         #                             END OF YOUR CODE                             #
@@ -158,6 +173,18 @@ class FullyConnectedNet(object):
         # automated tests, make sure that your L2 regularization includes a factor #
         # of 0.5 to simplify the expression for the gradient.                      #
         ############################################################################
+        loss, dx = softmax_loss(scores, y)
+        
+
+        dx, dw, db = affine_backward(dx, cache[self.num_layers-1])
+        loss += 0.5*self.reg*np.sum(self.params["W" + str(self.num_layers)]**2)
+        
+        for layer in range(self.num_layers-2, -1, -1):
+            loss += 0.5*self.reg*np.sum(self.params["W" + str(layer+1)]**2)
+            dx, dw, db = affine_relu_backward(dx, cache[layer])
+            grads["W" + str(layer+1)] = dw + self.reg*self.params["W" + str(layer+1)]
+            grads["b" + str(layer+1)] = db
+        
 
         ############################################################################
         #                             END OF YOUR CODE                             #
