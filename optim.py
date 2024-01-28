@@ -31,3 +31,46 @@ def sgd_momentum(w, dw, config=None):
     config['velocity'] = v
 
     return next_w, config
+
+
+def adam(x, dx, config=None):
+    """
+    Uses the Adam update rule, which incorporates moving averages of both the
+    gradient and its square and a bias correction term.
+
+    config format:
+    - learning_rate: Scalar learning rate.
+    - beta1: Decay rate for moving average of first moment of gradient.
+    - beta2: Decay rate for moving average of second moment of gradient.
+    - epsilon: Small scalar used for smoothing to avoid dividing by zero.
+    - m: Moving average of gradient.
+    - v: Moving average of squared gradient.
+    - t: Iteration number.
+    """
+    if config is None: config = {}
+    config.setdefault('learning_rate', 1e-3)
+    config.setdefault('beta1', 0.9)
+    config.setdefault('beta2', 0.999)
+    config.setdefault('epsilon', 1e-8)
+    config.setdefault('m', np.zeros_like(x))
+    config.setdefault('v', np.zeros_like(x))
+    config.setdefault('t', 0)
+
+    next_x = None
+    #############################################################################
+    # TODO: Implement the Adam update formula, storing the next value of x in   #
+    # the next_x variable. Don't forget to update the m, v, and t variables     #
+    # stored in config and to use the epsilon scalar to avoid dividing by zero. #
+    #############################################################################
+    t = config["t"] + 1
+    g = dx
+    m = config["beta1"] * config["m"] + (1 - config["beta1"]) * g
+    v = config["beta2"] * config["v"] + (1 - config["beta2"]) * g**2
+    m_hat = m / (1 - config["beta1"]**(t))
+    v_hat = v / (1 - config["beta2"]**(t))
+    next_x = x - config["learning_rate"] * m_hat / (np.sqrt(v_hat) + config["epsilon"])
+    #############################################################################
+    #                             END OF YOUR CODE                              #
+    #############################################################################
+
+    return next_x, config

@@ -178,7 +178,8 @@ class FullyConnectedNet(object):
 
         dx, dw, db = affine_backward(dx, cache[self.num_layers-1])
         loss += 0.5*self.reg*np.sum(self.params["W" + str(self.num_layers)]**2)
-        
+        grads["W" + str(self.num_layers)] = dw + self.reg*self.params["W" + str(self.num_layers)]
+        grads["b" + str(self.num_layers)] = db
         for layer in range(self.num_layers-2, -1, -1):
             loss += 0.5*self.reg*np.sum(self.params["W" + str(layer+1)]**2)
             dx, dw, db = affine_relu_backward(dx, cache[layer])
